@@ -26,5 +26,18 @@ class Course(models.Model):
     def __str__(self):
         return self.description
 
+
+class Enrollment(models.Model):
+    objects = models.Manager()
+    PERIOD = {
+        ('M', 'Matutinal'),
+        ('V', 'Vespertine'),
+        ('N', 'Nocturnal'),
+    }
+    student = models.ForeignKey(to=Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(to=Course, on_delete=models.CASCADE)
+    period = models.CharField(max_length=1, choices=PERIOD, blank=False, null=False, default='M')
+
+
 # python manage.py makemigrations
 # python manage.py migrate

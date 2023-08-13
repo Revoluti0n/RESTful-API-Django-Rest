@@ -1,6 +1,9 @@
-from rest_framework import viewsets
-from school.models import Student, Course
-from school.serializer import StudentSerializer, CourseSerializer
+from rest_framework import viewsets, generics
+from school.models import Student, Course, Enrollment
+from school.serializer import StudentSerializer, CourseSerializer, EnrollmentSerializer, \
+    StudentEnrollmentsListSerializer, EnrollmentStudentsListSerializer
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 # python manage.py runserver
@@ -20,6 +23,8 @@ class StudentsViewSet(viewsets.ModelViewSet):
 
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
 
 class CoursesViewSet(viewsets.ModelViewSet):
@@ -29,3 +34,44 @@ class CoursesViewSet(viewsets.ModelViewSet):
 
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+class EnrollmentsViewSet(viewsets.ModelViewSet):
+    """
+    Exibindo todas as matrículas.
+    """
+
+    queryset = Enrollment.objects.all()
+    serializer_class = EnrollmentSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+class StudentEnrollmentsList(generics.ListAPIView):
+    """
+    Listando as matrículas de um aluno ou aluna.
+    """
+
+    def get_queryset(self):
+        queryset = Enrollment.objects.filter(student_id=self.kwargs['pk'])
+        return queryset
+
+    serializer_class = StudentEnrollmentsListSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+class EnrollmentStudentsList(generics.ListAPIView):
+    """
+    Listando os alunos ou alunas matriculados um curso.
+    """
+
+    def get_queryset(self):
+        queryset = Enrollment.objects.filter(course_id=self.kwargs['pk'])
+        return queryset
+
+    serializer_class = EnrollmentStudentsListSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
